@@ -1,0 +1,7 @@
+backups/
+
+wallserver/.idea
+wallserver/accounts
+wallserver/out
+wallclient/out
+wallclient/.idea
