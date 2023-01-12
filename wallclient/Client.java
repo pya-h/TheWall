@@ -1,5 +1,10 @@
 package wallclient;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -8,12 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-
 
 public class Client {
     public static final String ROOT = "http://localhost:7001";
@@ -26,7 +25,8 @@ public class Client {
         if (resCode != HttpURLConnection.HTTP_OK) {
             if (resCode == HttpURLConnection.HTTP_UNAUTHORIZED)
                 throw new UnauthorizedException();
-
+            else if (resCode == HttpURLConnection.HTTP_CONFLICT)
+                throw new ConflictException();
         }
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -75,54 +75,45 @@ public class Client {
         return getResponse(connection);
     }
 
-    public static String makeRegistration () {
-        Scanner scanner = new Scanner(System.in);
+    public static String makeRegistration(Scanner scanner)
+            throws UnsupportedEncodingException, IOException, HttpExceptions {
         String response = "";
 
         try {
             String username, password;
             System.out.print("Username: ");
-            username = scanner.nextLine();
+            username = scanner.next();
             System.out.print("Password: ");
-            password = scanner.nextLine();
+            password = scanner.next();
             Map<String, String> data = new HashMap<>();
             data.put("username", username);
             data.put("password", password);
             response = post("register", data);
             // TODO: check for exception
-            scanner.close();
-        } catch (Exception ex) {
-            System.out.println("Sth went wrong: " + ex.getMessage());
-        } finally {
-            if (scanner != null)
-                scanner.close();
+        } catch (ConflictException cex) {
+            System.out.println("This username is already taken!");
         }
         return response;
     }
 
     private static String loginToken;
 
-    public static String doLogin() throws HttpExceptions, IOException {
-        Scanner scanner = new Scanner(System.in);
+    public static String doLogin(Scanner scanner) throws HttpExceptions, IOException {
         String response = "";
 
         try {
             String username, password;
             System.out.print("Username: ");
-            username = scanner.nextLine();
+            username = scanner.next();
             System.out.print("Password: ");
-            password = scanner.nextLine();
+            password = scanner.next();
             Map<String, String> data = new HashMap<>();
             data.put("username", username);
             data.put("password", password);
             response = post("login", data);
             // TODO: check for exception
-            scanner.close();
         } catch (UnauthorizedException ex) {
             System.out.println("ERROR: Username or password is incorrect!");
-        } finally {
-            if (scanner != null)
-                scanner.close();
         }
         return response;
     }
@@ -130,35 +121,68 @@ public class Client {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         try {
-            // Runtime.getRuntime().exec("cls");
+            String res = get("");
+            // Runtime.getRuntime().exec("clear");
+            System.out.println(res);
+
             while (loginToken == null || loginToken.equals("")) {
-                String res = get("");
-                System.out.println(res);
-                System.out.println("Login Menu:\n\t1. Login\n\t2. Register");
-                int destination = scanner.nextInt();
+                clearScreen();
+                System.out.println("--------------------- Login Menu ------------------------------------------\n");
+                System.out.println("\t\t\t1. Login\n\t\t\t2. Register");
+                System.out.print("GO: ");
+                String destination = scanner.next();
                 switch (destination) {
-                    case 1:
-                        loginToken = doLogin();
+                    case "1":
+                        loginToken = doLogin(scanner);
                         break;
                     // TODO: login code
-                    case 2:
-                        loginToken = makeRegistration();
+                    case "2":
+                        loginToken = makeRegistration(scanner);
                         break;
                     default:
                         System.out.println("Wrong destination! Please try again...");
                 }
-                // Runtime.getRuntime().exec("pause");
+                pause();
+            }
+            // now the user is logged in:
+            clearScreen();
+            while (true) {
+                System.out.println("--------------------- Main Menu ------------------------------------------\n");
+                System.out.println("t\t\t1. Profile\n\t\t\t2. Notices");
+                System.out.print("GO: ");
+                String destination = scanner.next();
+                switch (destination) {
+                    case "1":
+                        showProfile(scanner);
+                        break;
+                    case "2":
+                        // show an d check notices
+                        break;
+                    default:
+                        System.out.println("Wrong destination! Please try again...");
+
+                }
             }
 
-            // test
-            System.out.println("Hi " + loginToken);
         }
 
         catch (Exception ex) {
             // do sth
-        } finally {
-            if (scanner != null)
-                scanner.close();
+        }
+        scanner.close();
+
+    }
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
+
+    public static void pause() {
+        System.out.print("Press Enter key to continue...");
+        try {
+            System.in.read();
+        } catch (Exception e) {
         }
     }
 }

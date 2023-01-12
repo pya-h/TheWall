@@ -116,11 +116,11 @@ public class Account {
         if(numberOfFields < 1){
             fileScanner.close();
             throw new CorruptedDataException("This user's data is corrupted somehow!");
-        }    
+        }
         if(this.password == null || this.password.equals(""))
             this.setPassword(fields.get(0));
-        this.setFirstName(numberOfFields >= 1 ? fields.get(1) : "-");
-        this.setFirstName(numberOfFields >= 2 ? fields.get(2) : "-");
+        this.setFirstName(numberOfFields >= 2 ? fields.get(1) : "-");
+        this.setLastName(numberOfFields >= 3 ? fields.get(2) : "-");
         // avatars
         for(int i = 3; i < numberOfFields; i++) 
             this.addAvatar(fields.get(i));

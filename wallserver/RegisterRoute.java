@@ -1,6 +1,8 @@
 package wallserver;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.tools.jconsole.JConsoleContext;
 
@@ -15,7 +17,7 @@ public class RegisterRoute extends PostRequestHandler {
             Account newUser = Account.register(username, password);
             String response = newUser.getLoginToken();
             System.out.println("New user: " + username + " has registered!");
-            this.sendResponse(200, response);
+            this.sendResponse(HttpURLConnection.HTTP_OK, response);
         }
         catch(UnsupportedEncodingException uex) {
             // Todo: send proper response to client
@@ -23,8 +25,8 @@ public class RegisterRoute extends PostRequestHandler {
 
         }
         catch(UsernameExistsException uex) {
-            // TODO: send proper message to client
             System.out.println(uex.getMessage());
+            sendResponse(HttpURLConnection.HTTP_CONFLICT);
         }
         catch(IOException iox) {
             System.out.println(iox.getMessage());
