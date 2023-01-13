@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class Account {
     private String username, password, firstName, lastName, loginToken;
     private ArrayList<String> avatars = new ArrayList<>();
-    private static Map<String, Account> loggedInAccounts = new HashMap<>();
+    private static HashMap<String, Account> loggedInAccounts = new HashMap<>();
 
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
@@ -57,6 +57,13 @@ public class Account {
         byte[] randomBytes = new byte[24];
         secureRandom.nextBytes(randomBytes);
         return base64Encoder.encodeToString(randomBytes);
+    }
+    
+    public static Account getAccountByToken(String token) throws WrongTokenException {
+        Account acc = loggedInAccounts.get(token);
+        if(acc == null)
+            throw new WrongTokenException(token);
+        return acc;
     }
 
     public boolean addAvatar(String url) {
@@ -166,5 +173,17 @@ public class Account {
             fwUser.write(avatar  + "\n");
         }
         fwUser.close();
+    }
+    
+    public String toString() {
+        StringBuilder strAvatars = new StringBuilder(this.avatars.size() > 0 ? "{" : "-");
+
+        for(String avatar: avatars)
+            strAvatars.append(avatar).append(", \n");
+
+        if(this.avatars.size() > 0)
+            strAvatars.append("\n }");
+        return String.format("● Username: \t%s\n● Firstname: \t%s\n● Lastname: \t%s\n● Avatars: \t%s",
+            this.username, this.firstName, this.lastName, strAvatars.toString());
     }
 }
