@@ -15,7 +15,10 @@ public class Server {
 			httpServer.createContext("/", new RootRoute());
 			httpServer.createContext("/login", new LoginRoute());
 			httpServer.createContext("/register", new RegisterRoute());
-			httpServer.createContext("/profile/view", new ViewProfileRoute());	httpServer.setExecutor(Executors.newCachedThreadPool());
+			httpServer.createContext("/profile/view", new ViewProfileRoute());
+			httpServer.createContext("/profile/edit", new EditProfileRoute());
+
+			httpServer.setExecutor(Executors.newCachedThreadPool());
 			httpServer.start();
 		}
 		catch(IOException ex) {

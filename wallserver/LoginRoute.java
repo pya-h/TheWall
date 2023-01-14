@@ -23,7 +23,7 @@ public class LoginRoute extends PostRequestHandler {
         catch(WrongCredentialsException ex) {
             // TODO: send proper message to client
             System.out.println(ex.getMessage());
-            this.sendResponse(HttpURLConnection.HTTP_UNAUTHORIZED, ex.getMessage());
+            this.sendResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 
         }
         catch(IOException iox) {

@@ -24,7 +24,12 @@ public class Account {
     }
 
     public void setUsername(String username) {
-        // check username
+        // TODO: check username => if error => method not allowed
+        // TODO: check username doesnt exist
+        if(userExists(this.username)) {
+            File oldFile = new File(String.format("./accounts/%s.dat", this.username));
+            oldFile.delete();
+        }
         this.username = username;
     }
     public String getPassword() {
@@ -32,7 +37,7 @@ public class Account {
     }
 
     public void setPassword(String password) {
-        // check password
+        // TODO: check password => if error => method not allowed
         this.password = password;
     }
     
@@ -41,7 +46,8 @@ public class Account {
     }
 
     public void setFirstName(String firstName) {
-        // check firstName
+        // TODO: check firstname => if error => method not allowed
+
         this.firstName = firstName;
     }
     public String getLastName() {
@@ -49,7 +55,8 @@ public class Account {
     }
 
     public void setLastName(String lastName) {
-        // check lastName
+        // TODO: check lastname => if error => method not allowed
+
         this.lastName = lastName;
     }
     
@@ -176,14 +183,14 @@ public class Account {
     }
     
     public String toString() {
-        StringBuilder strAvatars = new StringBuilder(this.avatars.size() > 0 ? "{" : "-");
+        StringBuilder strAvatars = new StringBuilder(this.avatars.size() > 0 ? "{\n" : "-");
 
         for(String avatar: avatars)
-            strAvatars.append(avatar).append(", \n");
+            strAvatars.append("\t").append(avatar).append(", \n");
 
         if(this.avatars.size() > 0)
             strAvatars.append("\n }");
-        return String.format("● Username: \t%s\n● Firstname: \t%s\n● Lastname: \t%s\n● Avatars: \t%s",
+        return String.format("● Username: \t%s\n● Firstname: \t%s\n● Lastname: \t%s\n● Avatars: %s",
             this.username, this.firstName, this.lastName, strAvatars.toString());
     }
 }

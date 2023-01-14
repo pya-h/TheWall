@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class AuthenticateApp extends ClientApp {
 
-    public static String makeRegistration(Scanner scanner)
+    public static String makeRegistration()
             throws UnsupportedEncodingException, IOException, HttpExceptions {
         String response = "";
 
@@ -30,7 +30,7 @@ public class AuthenticateApp extends ClientApp {
     }
 
 
-    public static String doLogin(Scanner scanner) throws HttpExceptions, IOException {
+    public static String doLogin() throws HttpExceptions, IOException {
         String response = "";
 
         try {
@@ -59,12 +59,13 @@ public class AuthenticateApp extends ClientApp {
             String destination = scanner.next();
             switch (destination) {
                 case "1":
-                    loginToken = doLogin(scanner);
-                    System.out.println(loginToken);
+                    loginToken = doLogin();
+                  //  System.out.println("Login was successfull...");
                     break;
                 // TODO: login code
                 case "2":
-                    loginToken = makeRegistration(scanner);
+                    loginToken = makeRegistration();
+                   // System.out.println("Registeration was successfull...");
                     break;
                 default:
                     System.out.println("Wrong destination! Please try again...");
