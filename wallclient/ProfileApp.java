@@ -2,7 +2,6 @@ package wallclient;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class ProfileApp extends ClientApp {
@@ -64,6 +63,9 @@ public class ProfileApp extends ClientApp {
                         default:
                             System.out.println("Wrong choice! There is no such field to change!...");
                     }
+                }
+                catch(NotFoundException nfx) {
+                    System.out.println("The image url you provided not found!");
                 }
                 catch(UnauthorizedException ux) {
                     System.out.println("In order to chnage this field, you need to enter your current password correct!");

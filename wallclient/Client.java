@@ -23,6 +23,7 @@ public class Client extends ClientApp {
                             break;
                         case "2":
                             // show an d check notices
+                            NoticeApp.menu();
                             break;
                         default:
                             System.out.println("Wrong destination! Please try again...");

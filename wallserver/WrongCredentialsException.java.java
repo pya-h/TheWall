@@ -1,4 +1,4 @@
-package wallserver;
+package server;
 
 public class WrongCredentialsException extends Exception {
     public WrongCredentialsException() {

@@ -1,10 +1,9 @@
 package wallserver;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.tools.jconsole.JConsoleContext;
 
 public class RegisterRoute extends PostRequestHandler {
     @Override

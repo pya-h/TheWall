@@ -1,5 +1,6 @@
 package wallserver;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -71,11 +72,11 @@ public class PostRequestHandler implements HttpHandler {
     }
     public void sendResponse(int responseCode, String response) throws IOException {
         // this algorithm sends responses with any length without throwing exception for large messages
-        httpExchange.sendResponseHeaders(200, 0);
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(httpExchange.getResponseBody())) {
             try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8))) {
                 byte [] buffer = new byte [BUFFER_SIZE];
-                int segmentLength ;
+                int segmentLength;
                 while ((segmentLength = byteArrayInputStream.read(buffer)) != -1) {
                     bufferedOutputStream.write(buffer, 0, segmentLength);
                 }

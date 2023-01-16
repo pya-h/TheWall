@@ -30,6 +30,8 @@ public class ClientApp {
                 throw new ConflictException();
             else if(resCode == HttpURLConnection.HTTP_FORBIDDEN)
                 throw new ForbiddenException();
+            else if(resCode == HttpURLConnection.HTTP_NOT_FOUND)
+                throw new NotFoundException();
         }
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -78,7 +80,15 @@ public class ClientApp {
     }
 
     public static void clearScreen() {
-        System.out.print("\033[H\033[2J");
+        try {
+            if(System.getProperty("os.name").startsWith("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            }
+        }
+        catch(Exception ex) {
+            System.out.print("\033[H\033[2J");
+
+        }
         System.out.flush();
     }
 

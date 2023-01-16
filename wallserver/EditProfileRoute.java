@@ -1,10 +1,8 @@
 package wallserver;
 
 import com.sun.net.httpserver.HttpExchange;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Locale;
 
 public class EditProfileRoute extends PostRequestHandler {
     @Override
@@ -34,6 +32,10 @@ public class EditProfileRoute extends PostRequestHandler {
             account.save();
             System.out.printf("%s changed his/her %s successfully!\n", account.getUsername(), field);
             this.sendResponse(HttpURLConnection.HTTP_OK, account.toString());
+        }
+        catch(NotFoundException nfx) {
+            System.out.println(nfx.getMessage());
+            this.sendResponse(HttpURLConnection.HTTP_NOT_FOUND);
         }
         catch(WrongTokenException wtx) {
             // TODO: send proper message to client

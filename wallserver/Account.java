@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
+
+import java.awt.image.BufferedImage;
 
 public class Account {
     private String username, password, firstName, lastName, loginToken;
@@ -73,10 +77,18 @@ public class Account {
         return acc;
     }
 
-    public boolean addAvatar(String url) {
+    public static boolean isImageUrlValid(String url){  
+        try {  
+            BufferedImage image = ImageIO.read(new URL(url));   
+            return image != null;
+        } catch (IOException ex) {}
+        return false;  
+    }
+    public void addAvatar(String url) throws NotFoundException {
         // TODO: check url => if url not found return false
+        if(!isImageUrlValid(url))
+            throw new NotFoundException(url);
         this.avatars.add(url);
-        return true;
     }
     private Account(String username, String password) {
         this.username = username;
@@ -136,8 +148,11 @@ public class Account {
         this.setFirstName(numberOfFields >= 2 ? fields.get(1) : "-");
         this.setLastName(numberOfFields >= 3 ? fields.get(2) : "-");
         // avatars
-        for(int i = 3; i < numberOfFields; i++) 
-            this.addAvatar(fields.get(i));
+        for(int i = 3; i < numberOfFields; i++){ 
+            try {
+                this.addAvatar(fields.get(i));
+            } catch(NotFoundException nfx) {}
+        }
         fileScanner.close();
     }
     public static boolean userExists(final String username) {
@@ -190,7 +205,7 @@ public class Account {
 
         if(this.avatars.size() > 0)
             strAvatars.append("\n }");
-        return String.format("● Username: \t%s\n● Firstname: \t%s\n● Lastname: \t%s\n● Avatars: %s",
+        return String.format(". Username: \t%s\n. Firstname: \t%s\n. Lastname: \t%s\n. Avatars: %s",
             this.username, this.firstName, this.lastName, strAvatars.toString());
     }
 }
