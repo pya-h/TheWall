@@ -17,6 +17,7 @@ public class Server {
 			httpServer.createContext("/register", new RegisterRoute());
 			httpServer.createContext("/profile/view", new ViewProfileRoute());
 			httpServer.createContext("/profile/edit", new EditProfileRoute());
+			httpServer.createContext("/notices/+", new AddNoticeRoute());
 
 			httpServer.setExecutor(Executors.newCachedThreadPool());
 			httpServer.start();
