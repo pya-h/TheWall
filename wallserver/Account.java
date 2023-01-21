@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Account {
     private String username, password, firstName, lastName, loginToken;
@@ -19,14 +20,16 @@ public class Account {
     private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
     public static final String DIR_ACCOUNTS = "accounts";
     private final ArrayList<Long> noticeList = new ArrayList<>();
+    private final ArrayList<Long> favorites = new ArrayList<>();
 
+    private static final String SALT = "dghGHJS7891!@j";
     public String getUsername() {
         return this.username;
     }
 
-    public void setUsername(String username) {
-        // TODO: check username => if error => method not allowed
-        // TODO: check username doesnt exist
+    public void setUsername(String username) throws BadInputException {
+        if(!Pattern.matches("[a-zA-Z0-9._]*", username))
+            throw new BadInputException("username contains illegal characters!");
         Tools.deleteFile(DIR_ACCOUNTS, this.username);
         this.username = username;
     }
@@ -34,9 +37,28 @@ public class Account {
         return this.password;
     }
 
-    public void setPassword(String password) {
-        // TODO: check password => if error => method not allowed
-        this.password = password;
+    public void setPassword(String password) throws BadInputException {
+        if(!Pattern.matches("[a-z0-9]{8,}", password))
+            throw  new BadInputException("Password must be at least 8 characters and only use numbers and a-z...");
+        else {
+            char[] pass = password.toCharArray();
+            boolean hasBinary = false;
+            int numberOfAs = 0;
+            for(int i = 0; i < pass.length && numberOfAs < 2 && !hasBinary; i++) {
+                if(pass[i] == 'a')
+                    numberOfAs++;
+                if(pass[i] == '0' || pass[i] == '1')
+                    hasBinary = true;
+                if(i < pass.length - 1) {
+                    if(pass[i] + 1 == pass[i + 1] || pass[i + 1] + 1 == pass[i])
+                        throw new BadInputException("Pass must not contain consecutive numbers!");
+                }
+            }
+            if(!hasBinary && numberOfAs < 2)
+                throw new BadInputException("Password must has at least 2 'a' character or a binary digit!");
+
+        }
+        this.password = SALT + password + SALT;
     }
 
     public String getFirstName() {
@@ -77,14 +99,23 @@ public class Account {
             throw new NotFoundException(url);
         this.avatars.add(url);
     }
-    private Account(String username, String password) {
-        this.username = username;
-        this.password = password;
+    private Account(String username, String password) throws BadInputException {
+        this.setUsername(username);
+        this.setPassword(password);
         this.firstName = "-";
         this.lastName = "-";
     }
+    private Account(String username, String password, boolean noSalt) throws BadInputException {
+        this.setUsername(username);
+        if(noSalt)
+            this.password = password;
+        else
+            this.setPassword(password);
 
-    public static Account login(String username, String password) throws WrongCredentialsException, IOException, CorruptedDataException{
+        this.firstName = "-";
+        this.lastName = "-";
+    }
+    public static Account login(String username, String password) throws WrongCredentialsException, CorruptedDataException, BadInputException {
         if(!Tools.fileExists(DIR_ACCOUNTS, username))
             throw new WrongCredentialsException();
         try {
@@ -94,12 +125,13 @@ public class Account {
                 fileScanner.close();
                 throw new WrongCredentialsException();
             }
-            final String actualPassword = fileScanner.nextLine();
-            if(!actualPassword.equals(password)) {
+            final String actualPassword = fileScanner.nextLine(),
+                saltedInputPassword = SALT + password + SALT;
+            if(!actualPassword.equals(saltedInputPassword)) {
                 fileScanner.close();
                 throw new WrongCredentialsException();
             }
-            Account account = new Account(username, actualPassword);
+            Account account = new Account(username, actualPassword, true);
             account.load();
             final String token = newToken();
             account.setLoginToken(token);
@@ -119,19 +151,25 @@ public class Account {
         this.loginToken = token;
     }
 
+    public boolean comparePassword(String pass) {
+        return this.password.equals(SALT + pass + SALT);
+    }
+
     public void load() throws FileNotFoundException, CorruptedDataException {
         File file = new File(String.format("./%s/%s.dat", DIR_ACCOUNTS, this.username));
         Scanner fileScanner = new Scanner(file);
         ArrayList<String> fields = new ArrayList<>();
         while(fileScanner.hasNextLine())
             fields.add(fileScanner.nextLine());
+
         final int numberOfFields = fields.size();
         if(numberOfFields < 1){
             fileScanner.close();
+
             throw new CorruptedDataException("This user's data is corrupted somehow!");
         }
         if(this.password == null || this.password.equals(""))
-            this.setPassword(fields.get(0));
+            this.password = fields.get(0);
         this.setFirstName(numberOfFields >= 2 ? fields.get(1) : "-");
         this.setLastName(numberOfFields >= 3 ? fields.get(2) : "-");
         // avatars
@@ -141,17 +179,23 @@ public class Account {
             } catch(NotFoundException ignored) {}
         }
         fileScanner.close();
+
         // load notice list
         file = new File(String.format("./%s/%s.notices", DIR_ACCOUNTS, this.username));
         fileScanner = new Scanner(file);
         while(fileScanner.hasNextLong())
             this.noticeList.add(fileScanner.nextLong());
         fileScanner.close();
+
+        // load favorites list
+        file = new File(String.format("./%s/%s.fav", DIR_ACCOUNTS, this.username));
+        fileScanner = new Scanner(file);
+        while(fileScanner.hasNextLong())
+            this.favorites.add(fileScanner.nextLong());
+        fileScanner.close();
     }
 
-    public static Account register(String username, String password) throws UsernameExistsException, IOException {
-        // TODO: check password
-        // TODO: check users
+    public static Account register(String username, String password) throws UsernameExistsException, IOException, BadInputException {
         Account newOne = new Account(username, password);
         if(Tools.fileExists(DIR_ACCOUNTS, username))
             throw new UsernameExistsException(username);
@@ -179,6 +223,7 @@ public class Account {
         }
         fwUser.close();
         this.saveNoticeList();
+        this.saveFavorites();
     }
 
     public String toString() {
@@ -208,5 +253,46 @@ public class Account {
             fwNoticeList.write(noticeID + "\n");
         }
         fwNoticeList.close();
+    }
+
+    public boolean addToFavorites(long id) throws NotFoundException, IOException {
+        Notice notice = Notice.get(id);
+        boolean noticeExists = favorites.contains(id);
+        if(!noticeExists) {
+            favorites.add(id);
+        }
+        else {
+            favorites.remove(id);
+        }
+        this.saveFavorites();
+        return !noticeExists;
+
+    }
+
+    private void saveFavorites() throws IOException {
+        Tools.makeSureDirectoryExists(DIR_ACCOUNTS);
+
+        FileWriter fwNoticeList = new FileWriter(String.format("./%s/%s.fav", DIR_ACCOUNTS, this.username));
+        // write data
+
+        for(long noticeID: this.favorites) {
+            fwNoticeList.write(noticeID + "\n");
+        }
+        fwNoticeList.close();
+    }
+
+    public ArrayList<Notice> getFavorites() {
+        ArrayList<Notice> favs = new ArrayList<>();
+        for(long id: this.favorites) {
+            try {
+                favs.add(Notice.get(id));
+            } catch (NotFoundException ignored) { }
+        }
+        return favs;
+    }
+
+    public void logout() {
+        if(loggedInAccounts.containsKey(this.loginToken))
+            loggedInAccounts.remove(this.loginToken);
     }
 }

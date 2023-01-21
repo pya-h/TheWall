@@ -1,7 +1,7 @@
+.idea/
+.gitignore
+TheWall.iml
+accoutns/
+notices/
+out/
 backups/
-
-wallserver/.idea
-wallserver/accounts
-wallserver/out
-wallclient/out
-wallclient/.idea

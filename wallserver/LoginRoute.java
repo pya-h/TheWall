@@ -19,13 +19,14 @@ public class LoginRoute extends PostRequestHandler {
         catch(CorruptedDataException cde) {
             // TODO: send proper message to client
             System.out.println(cde.getMessage());
+            this.sendResponse(HttpURLConnection.HTTP_INTERNAL_ERROR);
         }
         catch(WrongCredentialsException ex) {
             // TODO: send proper message to client
             System.out.println(ex.getMessage());
             this.sendResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 
-        }
+        } catch (BadInputException ignored) { }
         catch(IOException iox) {
             // Todo: send response
             System.out.println(iox.getMessage());

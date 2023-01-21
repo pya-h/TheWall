@@ -15,19 +15,28 @@ public class EditProfileRoute extends PostRequestHandler {
                     value = this.parameters.get("value").toString();
             account = Account.getAccountByToken(token);
             switch (field) {
-                case "username" -> account.setUsername(value);
-                case "firstname" -> account.setFirstName(value);
-                case "lastname" -> account.setLastName(value);
-                case "password" -> {
+                case "username":
+                    account.setUsername(value);
+                    break;
+                case "firstname":
+                    account.setFirstName(value);
+                    break;
+                case "lastname":
+                    account.setLastName(value);
+                    break;
+                case "password":
                     String password = this.parameters.get("password").toString();
-                    if (!account.getPassword().equals(password))
+                    if (!account.comparePassword(password))
                         throw new WrongCredentialsException();
                     account.setPassword(value);
-                }
-                case "avatar" ->
+                    break;
+
+                case "avatar":
                     // TODO: check image exists on the net	h
                     account.addAvatar(value);
-                default -> throw new BadRequestException("User attempts to change a profile field that doesnt exists!");
+                    break;
+                default:
+                    throw new BadRequestException("User attempts to change a profile field that doesnt exists!");
             }
             account.save();
             System.out.printf("%s changed his/her %s successfully!\n", account.getUsername(), field);
@@ -36,6 +45,10 @@ public class EditProfileRoute extends PostRequestHandler {
         catch(NotFoundException nfx) {
             System.out.println(nfx.getMessage());
             this.sendResponse(HttpURLConnection.HTTP_NOT_FOUND);
+        }
+        catch (BadInputException bix) {
+            System.out.println(bix);
+            sendResponse(HttpURLConnection.HTTP_NOT_ACCEPTABLE);
         }
         catch(WrongTokenException wtx) {
             // TODO: send proper message to client

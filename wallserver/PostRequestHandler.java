@@ -11,6 +11,7 @@ import com.sun.net.httpserver.*;
 public class PostRequestHandler implements HttpHandler {
     protected Map<String, Object> parameters;
     protected HttpExchange httpExchange;
+
     public static final int BUFFER_SIZE = 1024;
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -18,8 +19,7 @@ public class PostRequestHandler implements HttpHandler {
         this.parameters = extractBody(httpExchange.getRequestBody());
     }
 
-    public static Map<String, Object> extractBody(InputStream body)
-        throws UnsupportedEncodingException, IOException {
+    public static Map<String, Object> extractBody(InputStream body) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(body, "utf-8");
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         String query = bufferedReader.readLine();

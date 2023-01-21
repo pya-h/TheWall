@@ -32,6 +32,10 @@ public class ClientApp {
                 throw new ForbiddenException();
             else if(resCode == HttpURLConnection.HTTP_NOT_FOUND)
                 throw new NotFoundException();
+            else if(resCode == HttpURLConnection.HTTP_INTERNAL_ERROR)
+                throw new InternalServerError();
+            else if(resCode == HttpURLConnection.HTTP_NOT_ACCEPTABLE)
+                throw new NotAcceptableException();
         }
 
         BufferedReader inputStream = new BufferedReader(new InputStreamReader(connection.getInputStream()));

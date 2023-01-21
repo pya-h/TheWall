@@ -25,6 +25,7 @@ public class ProfileApp extends ClientApp {
         data.put("value", newValue);
         return post("profile/edit", data);
     }
+
     public static void menu() throws AuthenticationRequiredException, HttpExceptions, IOException {
         try {
             HashMap<String, String> data = new HashMap<>();
@@ -39,7 +40,8 @@ public class ProfileApp extends ClientApp {
                     System.out.println(profileInAlignedText); // just making the text in cli aligned with others
                     pause();
                     System.out.println("------------------------- Edit --------------------------------------\n");
-                    System.out.println("\t\t\t1. Change Username\n\t\t\t2. Change First Name\n\t\t\t3. Change Last Name\n\t\t\t4. Add Avatar\n\t\t\t5. Change Password");
+                    System.out.println("\t\t\t1. Change Username\n\t\t\t2. Change First Name\n\t\t\t" +
+                            "3. Change Last Name\n\t\t\t4. Add Avatar\n\t\t\t5. Change Password\n\t\t\t0. Back");
                     String choice = scanner.next();
                     scanner = new Scanner(System.in); // prevent bug that will be cause when using .next, .nextLine, .nextInt abd .,..
                     switch(choice) {
@@ -60,6 +62,8 @@ public class ProfileApp extends ClientApp {
                             String currentPassword = scanner.nextLine();
                             profile = update("Password", currentPassword);
                             break;
+                        case "0":
+                            return;
                         default:
                             System.out.println("Wrong choice! There is no such field to change!...");
                     }
@@ -69,6 +73,12 @@ public class ProfileApp extends ClientApp {
                 }
                 catch(UnauthorizedException ux) {
                     System.out.println("In order to chnage this field, you need to enter your current password correct!");
+                }
+                catch(NotAcceptableException nax) {
+                    System.out.println("-------------------------------ERROR------------------------------");
+                    System.out.println("Conditions: Username supported characters are English alphabet and digits and '.' and '_" +
+                            "\nPassword must be at least 8 characters, containing only digits and lower case english alphabet, " +
+                            "\n and must contain binary digits or at least 2 'a' characters!\n And at last, Password must not contain Consecutive numbers (such as 123, 345, 65, ...) !");
                 }
                 pause();
             }
