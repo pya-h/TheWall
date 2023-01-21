@@ -24,6 +24,7 @@ public class Server {
 			httpServer.createContext("/notices/fav", new AddToFavoritesRoute());
 			httpServer.createContext("/logout", new LogoutRoute());
 			httpServer.setExecutor(Executors.newCachedThreadPool());
+			//TODO: Implement Edit notice route
 			httpServer.start();
 		}
 

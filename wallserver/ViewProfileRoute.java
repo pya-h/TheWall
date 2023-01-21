@@ -15,14 +15,13 @@ public class ViewProfileRoute extends PostRequestHandler {
             this.sendResponse(HttpURLConnection.HTTP_OK, account.toString());
         }
         catch(WrongTokenException wtx) {
-            // TODO: send proper message to client
             System.out.println(wtx.getMessage());
             sendResponse(HttpURLConnection.HTTP_FORBIDDEN);
         }
         catch(IOException iox) {
-            // Todo: send response
             System.out.println(iox.getMessage());
+            sendResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
     }
-    
+
 }

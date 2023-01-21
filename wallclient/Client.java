@@ -39,11 +39,9 @@ public class Client extends ClientApp {
                             ProfileApp.menu();
                             break;
                         case "2":
-                            // show an d check notices
                             NoticeApp.menu();
                             break;
                         case "0":
-                            // TODO: send logout request to server to remove token from list
                             logout();
                             pause();
                             break;

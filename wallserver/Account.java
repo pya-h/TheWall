@@ -66,7 +66,6 @@ public class Account {
     }
 
     public void setFirstName(String firstName) {
-        // TODO: check firstname => if error => method not allowed
 
         this.firstName = firstName;
     }
@@ -75,7 +74,6 @@ public class Account {
     }
 
     public void setLastName(String lastName) {
-        // TODO: check lastname => if error => method not allowed
 
         this.lastName = lastName;
     }
@@ -94,7 +92,6 @@ public class Account {
     }
 
     public void addAvatar(String url) throws NotFoundException {
-        // TODO: check url => if url not found return false
         if(!Tools.isImageUrlValid(url))
             throw new NotFoundException(url);
         this.avatars.add(url);
@@ -256,7 +253,7 @@ public class Account {
     }
 
     public boolean addToFavorites(long id) throws NotFoundException, IOException {
-        Notice notice = Notice.get(id);
+        Notice.get(id); // check if notice exists no not
         boolean noticeExists = favorites.contains(id);
         if(!noticeExists) {
             favorites.add(id);

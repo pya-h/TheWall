@@ -143,7 +143,6 @@ public class Notice {
     }
 
     public void addImage(String url) throws NotFoundException {
-        // TODO: check url => if url not found return false
         if(!Tools.isImageUrlValid(url))
             throw new NotFoundException(url);
         this.images.add(url);
@@ -221,8 +220,6 @@ public class Notice {
         fwNotice.close();
     }
 
-    // TODO: edit these
-    // TODO: add images in Notice.add
     public String toString() {
         return String.format("%20d\t%20s\t%10d", this.id, this.title, this.price);
     }
@@ -258,14 +255,18 @@ public class Notice {
             fields.add(fileScanner.nextLine());
 
         Notice notice;
-        if(fields.size() < 8)
+        if(fields.size() < 8){
+            fileScanner.close();
+
             throw new CorruptedDataException("This notice data file has been modified illegally!");
+        }
         try {
             notice = new Notice(id, fields.get(0), fields.get(1), Long.parseLong(fields.get(2)), fields.get(3),
                     fields.get(4), fields.get(5), fields.get(6));
             notice.setLastChangeDate(new Date(Long.parseLong(fields.get(7)))); // CHECK THIS: I WANT TO DO CONVERT STRING TO DATE
         }
         catch(NumberFormatException | BadInputException nfx) {
+            fileScanner.close();
             throw new CorruptedDataException("This notice data file has been modified illegally!");
         }
 

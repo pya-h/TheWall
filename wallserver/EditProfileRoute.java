@@ -32,7 +32,6 @@ public class EditProfileRoute extends PostRequestHandler {
                     break;
 
                 case "avatar":
-                    // TODO: check image exists on the net	h
                     account.addAvatar(value);
                     break;
                 default:
@@ -51,7 +50,6 @@ public class EditProfileRoute extends PostRequestHandler {
             sendResponse(HttpURLConnection.HTTP_NOT_ACCEPTABLE);
         }
         catch(WrongTokenException wtx) {
-            // TODO: send proper message to client
             System.out.println(wtx.getMessage());
             sendResponse(HttpURLConnection.HTTP_FORBIDDEN);
         }
@@ -63,9 +61,9 @@ public class EditProfileRoute extends PostRequestHandler {
             sendResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
         catch(IOException iox) {
-            // Todo: send response
             System.out.println(iox.getMessage());
+            sendResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
     }
-    
+
 }

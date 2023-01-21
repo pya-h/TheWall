@@ -28,7 +28,6 @@ public class AddNoticeRoute extends PostRequestHandler {
         }
 
         catch(WrongTokenException wtx) {
-            // TODO: send proper message to client
             System.out.println(wtx.getMessage());
             sendResponse(HttpURLConnection.HTTP_FORBIDDEN);
         } catch (BadInputException | NumberFormatException ex) {
@@ -36,9 +35,9 @@ public class AddNoticeRoute extends PostRequestHandler {
             sendResponse(HttpURLConnection.HTTP_NOT_ACCEPTABLE);
         }
         catch(IOException iox) {
-            // Todo: send response
             System.out.println(iox.getMessage());
+            sendResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
     }
-    
+
 }

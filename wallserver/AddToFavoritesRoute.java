@@ -23,7 +23,6 @@ public class AddToFavoritesRoute extends PostRequestHandler {
             sendResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
         catch(WrongTokenException wtx) {
-            // TODO: send proper message to client
             System.out.println(wtx.getMessage());
             sendResponse(HttpURLConnection.HTTP_FORBIDDEN);
         }
@@ -32,9 +31,9 @@ public class AddToFavoritesRoute extends PostRequestHandler {
             sendResponse(HttpURLConnection.HTTP_NOT_FOUND);
         }
         catch(IOException iox) {
-            // Todo: send response
             System.out.println(iox.getMessage());
+            sendResponse(HttpURLConnection.HTTP_BAD_REQUEST);
         }
     }
-    
+
 }
